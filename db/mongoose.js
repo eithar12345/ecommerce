@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
 mongoose
-  .connect('mongodb://localhost:27017/ecommerce')
+  .connect(process.env.MONGO_URI)
   .then(() => console.log(' MongoDB Connected'))
   .catch((err) => console.error(' MongoDB Error:', err.message));
