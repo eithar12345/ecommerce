@@ -23,6 +23,11 @@ app.use(orderRouter);
 app.use(wishlistRouter);
 app.use(adminRouter);
 
-app.listen(port, () => {
-  console.log(`Server is up on port ${port}`);
-});
+// لو شغال على Vercel، بنصدر الـ app وبنسكت (عشان Vercel بيتصرف لوحده)
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(port, () => {
+    console.log(`Server is up on port ${port}`);
+  });
+}
+
+module.exports = app;
