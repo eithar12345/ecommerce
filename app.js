@@ -11,7 +11,6 @@ const wishlistRouter = require('./routers/wishlist');
 const adminRouter = require('./routers/admin');
 
 const app = express();
-const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -23,11 +22,5 @@ app.use(orderRouter);
 app.use(wishlistRouter);
 app.use(adminRouter);
 
-// لو شغال على Vercel، بنصدر الـ app وبنسكت (عشان Vercel بيتصرف لوحده)
-if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
-  app.listen(port, () => {
-    console.log(`Server is up on port ${port}`);
-  });
-}
-
+// Vercel محتاج الملف يصدّر الـ app عشان يشتغل كـ Serverless Function
 module.exports = app;
