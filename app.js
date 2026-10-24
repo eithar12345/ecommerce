@@ -1,34 +1,43 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-require('./db/mongoose'); // شغل الاتصال بالداتابيز
+const connectDB = require('./db/mongoose'); // بنستدعي دالة الاتصال
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// استدعاء الروتس
-const userRouter = require('./routers/user');
-const productRouter = require('./routers/product');
-const cartRouter = require('./routers/cart');
-const orderRouter = require('./routers/order');
-const wishlistRouter = require('./routers/wishlist');
-const adminRouter = require('./routers/admin');
+// دالة بتشغل السيرفر والروتس بعد الاتصال
+const startServer = async () => {
+  await connectDB(); // بنستنى الاتصال يخلص
 
-// ربط الروتس بالمسارات (تم تعديل userRouter ليكون /)
-app.use('/', userRouter); 
-app.use('/', productRouter); 
-app.use('/carts', cartRouter);
-app.use('/orders', orderRouter);
-app.use('/wishlists', wishlistRouter);
-app.use('/admin', adminRouter);
+  // استدعاء الروتس جوه الدالة عشان ميتنفذوش غير بعد الاتصال
+  const userRouter = require('./routers/user');
+  const productRouter = require('./routers/product');
+  const cartRouter = require('./routers/cart');
+  const orderRouter = require('./routers/order');
+  const wishlistRouter = require('./routers/wishlist');
+  const adminRouter = require('./routers/admin');
 
-// تشغيل السيرفر
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server up on port ${port}`);
-});
+  // ربط الروتس
+  app.use('/', userRouter); 
+  app.use('/', productRouter); 
+  app.use('/carts', cartRouter);
+  app.use('/orders', orderRouter);
+  app.use('/wishlists', wishlistRouter);
+  app.use('/admin', adminRouter);
+
+  // تشغيل السيرفر (على جهازك)
+  if (process.env.NODE_ENV !== 'production') {
+    const port = process.env.PORT || 5000;
+    app.listen(port, () => {
+      console.log(`Server up on port ${port}`);
+    });
+  }
+};
+
+startServer();
 
 // تصدير الـ app لـ Vercel
 module.exports = app;
