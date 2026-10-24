@@ -7,7 +7,7 @@ const connectDB = async () => {
   try {
     const db = await mongoose.connect(process.env.MONGO_URI, {
       serverSelectionTimeoutMS: 5000,
-      bufferCommands: false, 
+      // شلنا bufferCommands: false عشان نسمح بالطلبات تستنى
     });
     isConnected = db.connections[0].readyState;
     console.log('MongoDB Connected');
@@ -16,4 +16,4 @@ const connectDB = async () => {
   }
 };
 
-module.exports = connectDB; // بنصدر الدالة بس، عشان app.js يناديها ويستناها
+module.exports = connectDB;
