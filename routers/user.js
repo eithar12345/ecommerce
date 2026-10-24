@@ -51,27 +51,18 @@ router.post('/users/register', async (req, res) => {
   }
 });
 
-// Register — Step 2: Verify OTP (Modified for Demo)
+// Register — Step 2: Verify OTP
 router.post('/users/verify-otp', async (req, res) => {
   try {
     const { email, otp } = req.body;
 
-    // 🛠️ التعديل بتاعنا: لو الكود 123456، بنكمل على طول
-    if (otp !== '123456') {
-      const otpDoc = await OTP.findOne({ email });
-      if (!otpDoc) {
-        return res.status(400).send({ error: 'OTP expired or not found' });
-      }
-
-      if (otpDoc.otp !== otp) {
-        return res.status(400).send({ error: 'Invalid OTP' });
-      }
-    }
-
-    // هنجيب بيانات المستخدم اللي متخزنة في الـ OTP
     const otpDoc = await OTP.findOne({ email });
     if (!otpDoc) {
-      return res.status(400).send({ error: 'Registration session expired. Please register again.' });
+      return res.status(400).send({ error: 'OTP expired or not found' });
+    }
+
+    if (otpDoc.otp !== otp) {
+      return res.status(400).send({ error: 'Invalid OTP' });
     }
 
     const user = new User({
@@ -80,7 +71,6 @@ router.post('/users/verify-otp', async (req, res) => {
     });
     await user.save();
 
-    // بنمسح الـ OTP خلاص
     await OTP.deleteOne({ _id: otpDoc._id });
 
     const token = await user.generateAuthToken();
@@ -91,7 +81,7 @@ router.post('/users/verify-otp', async (req, res) => {
   }
 });
 
-// Register — Simple (بدون OTP)
+// Register — Simple (بدون OTP) — للمستخدمين العاديين
 router.post('/users', async (req, res) => {
   try {
     const user = new User({
@@ -161,6 +151,7 @@ router.post('/users/forgot-password', async (req, res) => {
       return res.status(404).send({ error: 'No user with that email' });
     }
 
+    // Generate reset token
     const resetToken = crypto.randomBytes(20).toString('hex');
 
     user.resetPasswordToken = crypto
@@ -168,10 +159,11 @@ router.post('/users/forgot-password', async (req, res) => {
       .update(resetToken)
       .digest('hex');
 
-    user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+    user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 min
 
     await user.save();
 
+    // Send email
     const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
 
     await sendEmail({
@@ -190,7 +182,7 @@ router.post('/users/forgot-password', async (req, res) => {
 
     res.send({
       message: 'Password reset email sent',
-      resetToken,
+      resetToken, // ← في الإنتاج، متبعتش التوكن
     });
   } catch (e) {
     res.status(500).send({ error: e.message });
