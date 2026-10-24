@@ -1,14 +1,16 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-require('./db/mongoose'); // هنا بنشغل الاتصال (لأنه بينفذ connectDB جواه)
+const connectDB = require('./db/mongoose');
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
-// استدعاء الروتس
+// الاتصال بالداتابيز
+connectDB();
+
+// الروتس
 const userRouter = require('./routers/user');
 const productRouter = require('./routers/product');
 const cartRouter = require('./routers/cart');
@@ -23,10 +25,7 @@ app.use('/orders', orderRouter);
 app.use('/wishlists', wishlistRouter);
 app.use('/admin', adminRouter);
 
-// تشغيل السيرفر محلياً
-if (process.env.NODE_ENV !== 'production') {
-  const port = process.env.PORT || 5000;
-  app.listen(port, () => console.log(`Server up on port ${port}`));
-}
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`Server up on port ${port}`));
 
 module.exports = app;

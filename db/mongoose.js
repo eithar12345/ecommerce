@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const connectDB = async () => {
-  if (mongoose.connection.readyState === 1) return;
   try {
     await mongoose.connect(process.env.MONGO_URI, {
       serverSelectionTimeoutMS: 5000,
@@ -11,8 +10,5 @@ const connectDB = async () => {
     console.error('❌ MongoDB Error:', error.message);
   }
 };
-
-// بننفذ الاتصال أول ما الملف يتحمل
-connectDB();
 
 module.exports = connectDB;
