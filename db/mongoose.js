@@ -5,12 +5,14 @@ const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI, {
       serverSelectionTimeoutMS: 5000,
-      bufferCommands: false, 
     });
     console.log('✅ MongoDB Connected');
   } catch (error) {
     console.error('❌ MongoDB Error:', error.message);
   }
 };
+
+// بننفذ الاتصال أول ما الملف يتحمل
+connectDB();
 
 module.exports = connectDB;
