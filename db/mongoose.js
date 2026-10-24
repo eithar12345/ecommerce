@@ -7,7 +7,7 @@ const connectDB = async () => {
   try {
     const db = await mongoose.connect(process.env.MONGO_URI, {
       serverSelectionTimeoutMS: 5000,
-      bufferCommands: false, // <--- أهم سطر عشان Vercel ميعملش Timeout
+      bufferCommands: false, 
     });
     isConnected = db.connections[0].readyState;
     console.log('MongoDB Connected');
@@ -16,5 +16,4 @@ const connectDB = async () => {
   }
 };
 
-connectDB();
-module.exports = connectDB;
+module.exports = connectDB; // بنصدر الدالة بس، عشان app.js يناديها ويستناها
