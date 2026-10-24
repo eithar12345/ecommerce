@@ -22,5 +22,13 @@ app.use(orderRouter);
 app.use(wishlistRouter);
 app.use(adminRouter);
 
-// Vercel محتاج الملف يصدّر الـ app عشان يشتغل كـ Serverless Function
+// التعديل هنا: لو إحنا على Vercel (مش محلي)، منعملش listen
+if (process.env.NODE_ENV !== 'production') {
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => {
+    console.log(`Server is up on port ${port}`);
+  });
+}
+
+// تصدير الـ app لـ Vercel
 module.exports = app;
