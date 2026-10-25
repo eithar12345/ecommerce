@@ -17,13 +17,10 @@ const getOrCreateWishlist = async (userId) => {
 // ==================== Get My Wishlist ====================
 router.get('/wishlists/my', auth, async (req, res) => {
   try {
-    // التعديل هنا: ضفنا .populate('products') عشان نجيب بيانات المنتجات كاملة
     const wishlist = await Wishlist.findOne({ user: req.user._id }).populate('products');
-    
     if (!wishlist) {
       return res.send({ products: [] });
     }
-    
     res.send(wishlist);
   } catch (e) {
     res.status(500).send({ error: e.message });
@@ -47,7 +44,6 @@ router.post('/wishlists/add/:productId', auth, async (req, res) => {
     wishlist.products.push(req.params.productId);
     await wishlist.save();
 
-    // بنبعت المفضلات بعد التحديث عشان الفرونت إند يحدث
     const updatedWishlist = await Wishlist.findOne({ user: req.user._id }).populate('products');
     res.status(201).send(updatedWishlist);
   } catch (e) {
@@ -63,12 +59,17 @@ router.delete('/wishlists/remove/:productId', auth, async (req, res) => {
       return res.status(404).send({ error: 'Wishlist not found' });
     }
 
+    const productId = req.params.productId;
+    
+    // بنفلتر المنتجات وبنشيل اللي إحنا عايزين نمسحه
     wishlist.products = wishlist.products.filter(
-      (p) => p.toString() !== req.params.productId
+      (p) => p.toString() !== productId
     );
     await wishlist.save();
 
-    res.send(wishlist);
+    // بنرجع البيانات المحدثة عشان الفرونت إند يحدث
+    const updatedWishlist = await Wishlist.findOne({ user: req.user._id }).populate('products');
+    res.send(updatedWishlist);
   } catch (e) {
     res.status(500).send({ error: e.message });
   }
