@@ -7,9 +7,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// بنشغل الاتصال بالداتابيز أول ما السيرفر يقوم
-connectDB();
-
 // الروتس
 const userRouter = require('./routers/user');
 const productRouter = require('./routers/product');
@@ -25,10 +22,14 @@ app.use('/', orderRouter);
 app.use('/', wishlistRouter);
 app.use('/', adminRouter);
 
-// تشغيل السيرفر (للتجربة المحلية)
+// بنشغل الاتصال بالداتابيز
+connectDB();
+
+// في Vercel، بنصدر الـ app (عشان يشتغل كـ Serverless)
+module.exports = app;
+
+// للتشغيل المحلي بس
 if (process.env.NODE_ENV !== 'production') {
   const port = process.env.PORT || 3000;
   app.listen(port, () => console.log(`Server up on port ${port}`));
 }
-
-module.exports = app;

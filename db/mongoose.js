@@ -4,8 +4,8 @@ const connectDB = async () => {
   if (mongoose.connection.readyState === 1) return;
   try {
     await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 5000, 
-      bufferCommands: false, // مهم جداً عشان ميعملش Timeout
+      serverSelectionTimeoutMS: 5000,
+      // شلنا bufferCommands: false عشان نسمح للطلبات تستنى
     });
     console.log('✅ MongoDB Connected');
   } catch (error) {
