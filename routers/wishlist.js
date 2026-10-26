@@ -37,7 +37,8 @@ router.post('/wishlists/add/:productId', auth, async (req, res) => {
 
     const wishlist = await getOrCreateWishlist(req.user._id);
 
-    if (wishlist.products.includes(req.params.productId)) {
+    // منع التكرار
+    if (wishlist.products.some(p => p.toString() === req.params.productId)) {
       return res.status(400).send({ error: 'Already in wishlist' });
     }
 
@@ -59,17 +60,16 @@ router.delete('/wishlists/remove/:productId', auth, async (req, res) => {
       return res.status(404).send({ error: 'Wishlist not found' });
     }
 
-    const productId = req.params.productId;
+    // التعديل هنا: بنقارن الـ id كنص عشان نضمن إنه بيشيله
+    const productIdToRemove = req.params.productId;
     
-    // بنفلتر المنتجات وبنشيل اللي إحنا عايزين نمسحه
     wishlist.products = wishlist.products.filter(
-      (p) => p.toString() !== productId
+      (p) => p._id.toString() !== productIdToRemove && p.toString() !== productIdToRemove
     );
-    await wishlist.save();
+    
+    await wishlist.save(); // حفظ في الداتابيز
 
-    // بنرجع البيانات المحدثة عشان الفرونت إند يحدث
-    const updatedWishlist = await Wishlist.findOne({ user: req.user._id }).populate('products');
-    res.send(updatedWishlist);
+    res.send({ message: 'Removed successfully' });
   } catch (e) {
     res.status(500).send({ error: e.message });
   }
