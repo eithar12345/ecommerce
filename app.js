@@ -22,7 +22,7 @@ app.use('/', orderRouter);
 app.use('/', wishlistRouter);
 app.use('/', adminRouter);
 
-// بنشغل الاتصال بالداتابيز
+// بنشغل الداتابيز قبل أي حاجة
 connectDB();
 
 // في Vercel، بنصدر الـ app (عشان يشتغل كـ Serverless)
