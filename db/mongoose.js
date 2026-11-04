@@ -1,13 +1,14 @@
 const mongoose = require('mongoose');
 
+let isConnected = false;
+
 const connectDB = async () => {
-  if (mongoose.connection.readyState === 1) return;
-  
+  if (isConnected) return;
   try {
-    // زودنا وقت الانتظار لـ 10 ثواني عشان Vercel ياخد وقته
-    await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 10000, 
+    const db = await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 10000, // زودنا الوقت لـ 10 ثواني
     });
+    isConnected = db.connections[0].readyState;
     console.log('✅ MongoDB Connected');
   } catch (error) {
     console.error('❌ MongoDB Error:', error.message);
